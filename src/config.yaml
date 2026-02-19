@@ -1,0 +1,132 @@
+# Configuration file for Urban Prediction MPI Index Pipeline
+
+# Data paths
+data:
+  # Input file (loaded from LOCAL_FILE_PATH env variable)
+  input_file: "h3_index_no_restriction_EN.gpkg"
+  cities_boundaries_file: "ibge_municipios.gpkg"
+  # Output files (saved to data/ folder in project root)
+  output_folder: "data"
+  preprocessed_file: "h3_index_preprocessed.gpkg"
+  output_file: "h3_index_with_mpi.gpkg"
+
+# Preprocessing settings
+preprocessing:
+  # Cities to exclude (with 100% missing values in critical columns)
+  cities_to_exclude:
+    - "vinhedo"
+    - "santa barbara doeste"
+    - "cosmopolis"
+  
+  # Columns to check for missing values
+  missing_value_columns:
+    - "nr_distance_road_m"
+    - "nr_distance_urban_growth_2020_2022_m"
+    - "nr_distance_urban_area_m"
+    - "rt_people_households_ibge22"
+    - "nr_monthly_income_household"
+    - "nr_minimum_wage_household"
+    - "ds_minimum_wage_range_household"
+    - "nr_households_ibge22"
+    - "nr_population_ibge22"
+  
+  # Outlier treatment
+  outliers:
+    rt_people_households_ibge22:
+      method: "quantile_cap"
+      quantile: 0.999
+      fill_with: "median"
+  
+  # Columns to fill with median
+  fill_median_columns:
+    - "rt_people_households_ibge22"
+    - "nr_monthly_income_household"
+  
+  # Minimum wage value (Brazilian Real)
+  minimum_wage_value: 1621
+  
+  # Slope class columns to drop after recreation
+  slope_class_columns:
+    - "fl_slope_class_1"
+    - "fl_slope_class_2"
+    - "fl_slope_class_3"
+    - "fl_slope_class_4"
+
+# MPI (Mazziotta-Pareto Index) settings
+mpi:
+  # Features used for MPI calculation with their polarity
+  # '+' indicates positive contribution (higher is better)
+  # '-' indicates negative contribution (lower is better)
+  features:
+    nr_distance_urban_growth_2020_2022_m:
+      polarity: "-"
+      description: "Distance to urban growth areas (2020-2022)"
+    
+    nr_distance_road_m:
+      polarity: "-"
+      description: "Distance to roads"
+    
+    nr_distance_highways_m:
+      polarity: "-"
+      description: "Distance to highways"
+    
+    nr_distance_urban_area_m:
+      polarity: "-"
+      description: "Distance to urban areas"
+    
+    nr_poi_positive:
+      polarity: "+"
+      description: "Number of positive points of interest"
+    
+    nr_poi_negative:
+      polarity: "-"
+      description: "Number of negative points of interest"
+    
+    fl_construction_restriction:
+      polarity: "-"
+      description: "Construction restriction flag"
+    
+    nr_population_ibge22:
+      polarity: "+"
+      description: "Population (IBGE 2022)"
+    
+    nr_households_ibge22:
+      polarity: "+"
+      description: "Number of households (IBGE 2022)"
+    
+    rt_people_households_ibge22:
+      polarity: "+"
+      description: "People per household ratio (IBGE 2022)"
+    
+    nr_minimum_wage_household:
+      polarity: "+"
+      description: "Minimum wages per household"
+    
+    nr_poor_urban_communities:
+      polarity: "-"
+      description: "Number of poor urban communities"
+    
+    fl_contaminated_area:
+      polarity: "-"
+      description: "Contaminated area flag"
+    
+    nr_slope:
+      polarity: "-"
+      description: "Terrain slope"
+
+  # MPI threshold for classification
+  threshold: 100
+  
+  # Labels for MPI classification
+  labels:
+    above_threshold: "Above 100 - better locations"
+    below_threshold: "Below 100 - worse locations"
+    no_data: "No data"
+
+# Output settings
+output:
+  # Column names for MPI results
+  mpi_index_column: "mpi_idx_all_features"
+  mpi_flag_column: "mpi_flag_all_features"
+  mpi_index_per_city_column: "mpi_idx_all_features_per_city"
+  mpi_flag_per_city_column: "mpi_flag_all_features_per_city"

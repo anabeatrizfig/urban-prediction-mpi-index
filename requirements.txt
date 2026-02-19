@@ -1,0 +1,17 @@
+# Urban Prediction MPI Index Pipeline - Dependencies
+
+# Core data processing
+geopandas>=0.14.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Configuration
+pyyaml>=6.0
+python-dotenv>=1.0.0
+
+# Visualization (optional, for notebooks)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# H3 spatial indexing (optional)
+h3>=3.7.0
